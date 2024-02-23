@@ -1,0 +1,38 @@
+listen = "0.0.0.0:3000"
+
+[[fields]]
+id = "IDNumber"
+distinct = true
+
+[[fields]]
+id = "Name"
+
+[[fields]]
+id = "Phone"
+distinct = true
+
+[[relations]]
+name = "IdPhone"
+connect = "daigunyun.db"
+table_name = "id_phone"
+
+[[relations.fields]]
+id = "IDNumber"
+query = "idnum"
+
+[[relations.fields]]
+id = "Phone"
+query = "phone"
+
+[[relations]]
+name = "NameId"
+connect = "daigunyun.db"
+table_name = "name_id"
+
+[[relations.fields]]
+id = "IDNumber"
+query = "idnum"
+
+[[relations.fields]]
+id = "Name"
+query = "name"
