@@ -245,10 +245,17 @@ async fn query(
                     }
                 };
                 for (field, value) in result {
+                    if let Some(set) = all_result.get_mut(&field) {
+                        set.insert(value.clone());
+                    } else {
+                        let mut s = HashSet::new();
+                        s.insert(value.clone());
+                        all_result.insert(field.clone(), s);
+                    }
                     let v = RelationFieldValue {
                         relation: rel.cfg.name.clone(),
                         field: field.clone(),
-                        value: value.clone(),
+                        value,
                     };
                     // skip non-distinct fields to prevent generating irrelevant results
                     if !state.fields.get(&field).expect("missing field info").distinct {
@@ -259,13 +266,6 @@ async fn query(
                         continue;
                     }
                     unvisited.insert(v);
-                    if let Some(set) = all_result.get_mut(&field) {
-                        set.insert(value);
-                    } else {
-                        let mut s = HashSet::new();
-                        s.insert(value);
-                        all_result.insert(field, s);
-                    }
                 }
                 unvisited.remove(&RelationFieldValue {
                     relation: rel.cfg.name.clone(),
