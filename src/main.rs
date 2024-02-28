@@ -10,6 +10,7 @@ use futures_util::future::join_all;
 use futures_util::TryStreamExt;
 use serde_derive::{Deserialize, Serialize};
 use sqlx::{Column, Row, SqlitePool};
+use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::sqlite::SqlitePoolOptions;
 use tokio::task::JoinError;
 use tracing::{debug, info};
@@ -36,8 +37,11 @@ impl RelationReader {
         if cfg.fields.is_empty() {
             return Err(anyhow!("relation does not have any field"));
         }
-        // TODO make this configurable
-        match SqlitePoolOptions::new().max_connections(50).connect(&cfg.connect).await {
+        let opts = SqliteConnectOptions::new()
+            .filename(&cfg.connect).read_only(true)
+            .create_if_missing(false);
+        match SqlitePoolOptions::new()
+            .max_connections(50).connect_with(opts).await {
             Ok(p) => Ok(RelationReader {
                 cfg: cfg.clone(),
                 db: p,
